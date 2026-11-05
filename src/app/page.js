@@ -19,19 +19,17 @@ export default function HomePage() {
   const bentoTrackRef = useRef(null);
 
   useEffect(() => {
-    // Mobile Auto-Slide for Amenities Bento
+    // Mobile Auto-Slide for Amenities Bento (One full card at a time)
     let bentoInterval = null;
     if (typeof window !== 'undefined' && window.innerWidth <= 992 && bentoTrackRef.current) {
       const el = bentoTrackRef.current;
+      let currentIndex = 0;
+      const totalCards = 6;
       bentoInterval = setInterval(() => {
         if (!el) return;
-        const maxScroll = el.scrollWidth - el.clientWidth;
-        const step = el.clientWidth * 0.84;
-        if (el.scrollLeft + step >= maxScroll - 10) {
-          el.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          el.scrollBy({ left: step, behavior: 'smooth' });
-        }
+        currentIndex = (currentIndex + 1) % totalCards;
+        const targetScroll = currentIndex * el.clientWidth;
+        el.scrollTo({ left: targetScroll, behavior: 'smooth' });
       }, 3500);
     }
     // 1. Lenis Smooth Momentum Scroll Engine
