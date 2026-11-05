@@ -16,8 +16,24 @@ export default function HomePage() {
   const progressBarRef = useRef(null);
   const hudStepRef = useRef(null);
   const horizontalTrackRef = useRef(null);
+  const bentoTrackRef = useRef(null);
 
   useEffect(() => {
+    // Mobile Auto-Slide for Amenities Bento
+    let bentoInterval = null;
+    if (typeof window !== 'undefined' && window.innerWidth <= 992 && bentoTrackRef.current) {
+      const el = bentoTrackRef.current;
+      bentoInterval = setInterval(() => {
+        if (!el) return;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        const step = el.clientWidth * 0.84;
+        if (el.scrollLeft + step >= maxScroll - 10) {
+          el.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          el.scrollBy({ left: step, behavior: 'smooth' });
+        }
+      }, 3500);
+    }
     // 1. Lenis Smooth Momentum Scroll Engine
     const lenis = new Lenis({
       duration: 1.35,
@@ -242,19 +258,8 @@ export default function HomePage() {
       });
     }
 
-    // 5. Bento Amenities Stagger (Keep cards fully visible, gentle entrance translate only)
-    gsap.from('.bento-card', {
-      scrollTrigger: {
-        trigger: '.amenities-bento',
-        start: 'top 85%',
-      },
-      y: 30,
-      stagger: 0.08,
-      duration: 0.8,
-      ease: 'power2.out',
-    });
-
     return () => {
+      if (bentoInterval) clearInterval(bentoInterval);
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
       ScrollTrigger.getAll().forEach((t) => t.kill());
@@ -413,7 +418,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="amenities-bento">
+        <div className="amenities-bento" ref={bentoTrackRef}>
           <div className="bento-card">
             <span className="bento-index">01</span>
             <h3 className="bento-title">120 Appointed Residences</h3>
